@@ -18,8 +18,8 @@ def similiridad_jaccard_ngramas(sec1: list[str], sec2: list[str], n: int = 3) ->
         return 0.0
     return len(interseccion) / len(union)
 
-def levenshtein_distance(seq1: list[str], seq2: list[str]) -> int:
-    m, n = len(seq1), len(seq2)
+def distancia_levenshtein(sec1: list[str], sec2: list[str]) -> int:
+    m, n = len(sec1), len(sec2)
     dp = [[0] * (n + 1) for _ in range(m + 1)]
 
     for i in range(m + 1):
@@ -29,18 +29,18 @@ def levenshtein_distance(seq1: list[str], seq2: list[str]) -> int:
 
     for i in range(1, m + 1):
         for j in range(1, n + 1):
-            if seq1[i-1] == seq2[j-1]:
+            if sec1[i-1] == sec2[j-1]:
                 dp[i][j] = dp[i-1][j-1]
             else:
-                dp[i][j] = 1 + min(dp[i-1][j],       # Borrado
+                dp[i][j] = 1 + min(dp[i-1][j],       # Eliminación
                                    dp[i][j-1],       # Inserción
                                    dp[i-1][j-1])     # Sustitución
 
     return dp[m][n]
 
-def normalized_levenshtein_similarity(seq1: list[str], seq2: list[str]) -> float:
-    max_len = max(len(seq1), len(seq2))
-    if max_len == 0:
+def similitud_levenshtein_normalizada(sec1: list[str], sec2: list[str]) -> float:
+    longitud_max = max(len(sec1), len(sec2))
+    if longitud_max == 0:
         return 1.0
-    dist = levenshtein_distance(seq1, seq2)
-    return 1.0 - (dist / max_len)
+    dist = distancia_levenshtein(sec1, sec2)
+    return 1.0 - (dist / longitud_max)
