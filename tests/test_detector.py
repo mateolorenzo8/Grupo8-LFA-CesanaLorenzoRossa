@@ -2,7 +2,7 @@ import ast
 import pytest
 from src.normalizador import normalizar_funcion_ast
 from src.serializador import serializar_ast_preorder
-from src.similitud import similiridad_jaccard_ngramas, similitud_levenshtein_normalizada
+from src.similitud import similiritud_jaccard_ngramas, similitud_levenshtein_normalizada
 
 UMBRAL_SIMILITUD = 0.70
 
@@ -49,7 +49,7 @@ def obtener_media(lista_valores):
     tokens_1 = _obtener_tokens_desde_codigo(codigo_original)
     tokens_2 = _obtener_tokens_desde_codigo(codigo_clonado)
 
-    score_jaccard = similiridad_jaccard_ngramas(tokens_1, tokens_2, n=3)
+    score_jaccard = similiritud_jaccard_ngramas(tokens_1, tokens_2, n=3)
     score_levenshtein = similitud_levenshtein_normalizada(tokens_1, tokens_2)
 
     # La normalización convierte variables a VAR1, VAR2... por lo que el AST normalizado es idéntico
@@ -81,7 +81,7 @@ def registrar_usuario(nom, ed, correo):
     tokens_1 = _obtener_tokens_desde_codigo(codigo_base)
     tokens_2 = _obtener_tokens_desde_codigo(codigo_reordenado)
 
-    score_jaccard = similiridad_jaccard_ngramas(tokens_1, tokens_2, n=3)
+    score_jaccard = similiritud_jaccard_ngramas(tokens_1, tokens_2, n=3)
 
     assert score_jaccard >= UMBRAL_SIMILITUD, f"Esperado >= {UMBRAL_SIMILITUD}, obtenido Jaccard: {score_jaccard}"
 
@@ -114,7 +114,7 @@ def obtener_descuento(cliente):
     tokens_1 = _obtener_tokens_desde_codigo(codigo_bucle)
     tokens_2 = _obtener_tokens_desde_codigo(codigo_condicional)
 
-    score_jaccard = similiridad_jaccard_ngramas(tokens_1, tokens_2, n=3)
+    score_jaccard = similiritud_jaccard_ngramas(tokens_1, tokens_2, n=3)
     score_levenshtein = similitud_levenshtein_normalizada(tokens_1, tokens_2)
 
     assert score_jaccard < UMBRAL_SIMILITUD, f"Esperado < {UMBRAL_SIMILITUD}, obtenido Jaccard: {score_jaccard}"
@@ -146,7 +146,7 @@ def factorial_recursivo(n):
     tokens_1 = _obtener_tokens_desde_codigo(codigo_iterativo)
     tokens_2 = _obtener_tokens_desde_codigo(codigo_recursivo)
 
-    score_jaccard = similiridad_jaccard_ngramas(tokens_1, tokens_2, n=3)
+    score_jaccard = similiritud_jaccard_ngramas(tokens_1, tokens_2, n=3)
     score_levenshtein = similitud_levenshtein_normalizada(tokens_1, tokens_2)
 
     # El AST difiere drásticamente (nodo While vs nodo If y llamadas recursivas)
