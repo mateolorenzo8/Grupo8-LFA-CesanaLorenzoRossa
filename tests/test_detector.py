@@ -190,9 +190,11 @@ def procesar_datos(lista):
     tokens_1 = _obtener_tokens_desde_codigo(codigo_base)
     tokens_2 = _obtener_tokens_desde_codigo(codigo_con_bloque_extra)
 
-    score_jaccard = similitud_levenshtein_normalizada(tokens_1, tokens_2)
+    score_jaccard = similitud_jaccard_ngramas(tokens_1, tokens_2)
+    score_levenshtein = similitud_levenshtein_normalizada(tokens_1, tokens_2)
 
     assert score_jaccard < UMBRAL_SIMILITUD, f"Esperado < {UMBRAL_SIMILITUD}, obtenido Jaccard: {score_jaccard}"
+    assert score_levenshtein < UMBRAL_SIMILITUD, f"Esperado < {UMBRAL_SIMILITUD}, obtenido Levenshtein: {score_levenshtein}"
 
 
 def test_caso_negativo_reordenamiento_grande_de_bloques():
