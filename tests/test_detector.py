@@ -152,3 +152,115 @@ def factorial_recursivo(n):
     # El AST difiere drásticamente (nodo While vs nodo If y llamadas recursivas)
     assert score_jaccard < UMBRAL_SIMILITUD, f"Esperado < {UMBRAL_SIMILITUD}, obtenido Jaccard: {score_jaccard}"
     assert score_levenshtein < UMBRAL_SIMILITUD, f"Esperado < {UMBRAL_SIMILITUD}, obtenido Levenshtein: {score_levenshtein}"
+
+
+
+def test_caso_negativo_insercion_de_codigo_extenso():
+    """
+    Prueba de limitación (Caso Negativo / Falso Negativo):
+    Una función a la que se le agrega un bloque de código extenso en el medio.
+    Aunque la estructura general es similar, la abundancia de nuevos tokens
+    hace caer el puntaje por debajo del umbral (< 0.70).
+    """
+    codigo_base = """
+def procesar_datos(lista):
+    resultado = []
+    for x in lista:
+        resultado.append(x * 2)
+    return resultado
+"""
+
+    codigo_con_bloque_extra = """
+def procesar_datos(lista):
+    resultado = []
+
+    # Bloque extenso insertado en el medio
+    if len(lista) > 10:
+        for i in range(len(lista)):
+            if i % 2 == 0:
+                print("Procesando elemento par:", i)
+            else:
+                print("Procesando elemento impar:", i)
+
+    for x in lista:
+        resultado.append(x * 2)
+    return resultado
+"""
+
+    tokens_1 = _obtener_tokens_desde_codigo(codigo_base)
+    tokens_2 = _obtener_tokens_desde_codigo(codigo_con_bloque_extra)
+
+    score_jaccard = similitud_levenshtein_normalizada(tokens_1, tokens_2)
+
+    assert score_jaccard < UMBRAL_SIMILITUD, f"Esperado < {UMBRAL_SIMILITUD}, obtenido Jaccard: {score_jaccard}"
+
+
+def test_caso_negativo_reordenamiento_grande_de_bloques():
+    """
+    Prueba de limitación (Caso Negativo / Falso Negativo - Caso 3):
+    Reordenamiento grande de bloques de código.
+    Aunque la herramienta tolera pequeños cambios de orden entre líneas cercanas,
+    si se cambia de lugar el orden de varios bloques completos (ej: mover estructuras
+    de control completas de sitio), la secuencia y la asignación secuencial de
+    variables en el AST cambian lo suficiente para que el puntaje de similitud caiga (< 0.70).
+    """
+    codigo_original = """
+def procesar_lote_operaciones(datos, config):
+    # Bloque 1: Bucle de filtrado y mapeo
+    filtrados = []
+    for item in datos:
+        if item.activo:
+            filtrados.append(item.valor * 2)
+
+    # Bloque 2: Validacion condicional profunda
+    if config.modo == 1:
+        limite = 100
+        factor = 1.5
+    else:
+        limite = 50
+        factor = 1.0
+
+    # Bloque 3: Reduccion / acumulacion con while
+    total = 0
+    i = 0
+    while i < len(filtrados):
+        total += filtrados[i] * factor
+        i += 1
+
+    return total > limite
+"""
+
+    codigo_reordenado = """
+def ejecutar_lote_reordenado(entradas, opciones):
+    # Bloque 2 movido al inicio
+    if opciones.modo == 1:
+        tope = 100
+        multiplicador = 1.5
+    else:
+        tope = 50
+        multiplicador = 1.0
+
+    # Bloque 3 movido al medio
+    acumulado = 0
+    indice = 0
+    while indice < len(entradas):
+        acumulado += entradas[indice] * multiplicador
+        indice += 1
+
+    # Bloque 1 movido al final
+    depurados = []
+    for elem in entradas:
+        if elem.activo:
+            depurados.append(elem.valor * 2)
+
+    return acumulado > tope
+"""
+
+    tokens_1 = _obtener_tokens_desde_codigo(codigo_original)
+    tokens_2 = _obtener_tokens_desde_codigo(codigo_reordenado)
+
+    score_jaccard = similitud_jaccard_ngramas(tokens_1, tokens_2, n=3)
+    score_levenshtein = similitud_levenshtein_normalizada(tokens_1, tokens_2)
+
+    assert score_jaccard < UMBRAL_SIMILITUD, f"Esperado < {UMBRAL_SIMILITUD}, obtenido Jaccard: {score_jaccard}"
+    assert score_levenshtein < UMBRAL_SIMILITUD, f"Esperado < {UMBRAL_SIMILITUD}, obtenido Levenshtein: {score_levenshtein}"
