@@ -3,7 +3,7 @@ import os
 from src.extractor import extraer_funciones_directorio, extraer_funciones_archivo
 from src.normalizador import normalizar_funcion_ast
 from src.serializador import serializar_ast_preorder
-from src.similitud import similiridad_jaccard_ngramas, similitud_levenshtein_normalizada
+from src.similitud import similitud_jaccard_ngramas, similitud_levenshtein_normalizada
 
 UMBRAL_SIMILITUD = 0.70  # Umbral documentado (70%)
 
@@ -48,7 +48,7 @@ def main():
         tokens = serializar_ast_preorder(meta_normalizada)
 
         if argumentos.metrica == "jaccard":
-            puntaje = similiridad_jaccard_ngramas(tokens_objetivo, tokens, n=3)
+            puntaje = similitud_jaccard_ngramas(tokens_objetivo, tokens, n=3)
         else:
             puntaje = similitud_levenshtein_normalizada(tokens_objetivo, tokens)
 
