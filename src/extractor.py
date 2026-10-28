@@ -12,7 +12,7 @@ class FuncionMetadata:
 def extraer_funciones_archivo(ruta: str) -> list[FuncionMetadata]:
     with open(ruta, "r", encoding="utf-8") as a:
         try:
-            arbol = ast.parse(f.read(), filename=ruta)
+            arbol = ast.parse(a.read(), filename=ruta)
         except SyntaxError:
             return []
 
@@ -29,9 +29,9 @@ def extraer_funciones_archivo(ruta: str) -> list[FuncionMetadata]:
 
 def extraer_funciones_directorio(directorio: str) -> list[FuncionMetadata]:
     funciones = []
-    for ruta, _, archivos in os.walk(directory):
+    for ruta, _, archivos in os.walk(directorio):
         for archivo in archivos:
-            if file.endswith(".py"):
+            if archivo.endswith(".py"):
                 ruta_completa = os.path.join(ruta, archivo)
                 funciones.extend(extraer_funciones_archivo(ruta_completa))
     return funciones
