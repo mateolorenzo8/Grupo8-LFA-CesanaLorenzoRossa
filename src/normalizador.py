@@ -39,7 +39,4 @@ def normalizar_funcion_ast(nodo_func: ast.FunctionDef) -> ast.FunctionDef:
     # Hicimos como override a metodos de la lib arriba
     ast_normalizado = normalizador.visit(copia_nodo)
 
-    # Ver si falla, si es necesario!
-    #ast.fix_missing_locations(ast_normalizado)
-
     return ast_normalizado
